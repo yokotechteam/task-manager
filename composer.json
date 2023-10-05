@@ -1,0 +1,23 @@
+{
+    "name": "anonyblank/task-manager",
+    "autoload": {
+        "psr-4": {
+            "Anonyblank\\TaskManager\\": "src/",
+            "App\\": "app/"
+        },
+        "files": [
+            "app/Helper/view.php",
+            "app/init.php",
+            "config/database.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "anonyblank",
+            "email": "hlanwai343@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.8"
+    }
+}
