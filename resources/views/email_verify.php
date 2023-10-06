@@ -15,13 +15,25 @@
     <div class="d-flex justify-content-center mt-5">
 
       <!-- REGISTER START -->
-      <form action="email_verify" method="post" class=" row container bg-body-secondary py-3 rounded-3 ">
+      <form action="email-verify" method="post" class=" row container bg-body-secondary py-3 rounded-3 ">
         <h3 class="text-center ">EMAIL VERIFICATION</h3>
 
         <!-- USER EMAIL -->
         <div class="mb-3 col-12">
           <label for="opt" class="form-label">VERIFICATION CODE</label>
-          <input type="text" name="opt" id="opt" class="form-control">
+          <input type="text" name="opt" id="opt" class="form-control 
+          <?= isset( $_COOKIE[ '_jwtTokenExpired' ] ) || isset( $_COOKIE[ 'optError' ] ) ? "border-danger" : ""; ?>
+          ">
+          <span class="text-bg-warning 
+          <?= isset( $_COOKIE[ '_jwtTokenExpired' ] ) ? "d-flex" : "d-none"; ?>">
+            <?= $_COOKIE[ '_jwtTokenExpired' ]; ?>
+            <?php setcookie ( "_jwtTokenExpired", '', time () - 3600 ); ?>
+          </span>
+          <span class="text-bg-warning 
+          <?= isset( $_COOKIE[ 'optError' ] ) ? "d-flex" : "d-none"; ?>">
+            <?= $_COOKIE[ 'optError' ]; ?>
+            <?php setcookie ( "optError", '', time () - 3600 ); ?>
+          </span>
         </div>
 
 

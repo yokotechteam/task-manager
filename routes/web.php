@@ -7,13 +7,17 @@ use App\Controllers\Page;
 $ROOT = '/task-manager/public';
 
 $routes = [ 
-  '/'             => [ User::class, 'index' ],
+  '/home'         => [ User::class, 'index' ],
   '/login'        => [ User::class, 'login' ],
   '/register'     => [ User::class, 'register' ],
   '/email-verify' => [ User::class, 'email_verify' ]
 ];
 $route  = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
-
+// die( var_dump ( $route ) );
+if ( $route === '/' )
+{
+  return header ( "Location: home" );
+}
 if ( ! array_key_exists ( $route, $routes ) )
 {
   return false;

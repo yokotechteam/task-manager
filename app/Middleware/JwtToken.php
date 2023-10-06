@@ -3,7 +3,9 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use DateTimeImmutable;
+use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class JwtToken
 {
@@ -12,15 +14,15 @@ class JwtToken
   public $domainName = 'firebase-adminsdk-2rkbg@jwt-token-3032f.iam.gserviceaccount.com';
   public $username;
   public $user_email;
-  public function create ()
+  public function encode ()
   {
-    $secret_Key   = $this->secret_Key;
-    $date         = new DateTimeImmutable ();
-    $expire_at    = $date->modify ( $this->expire_at )->getTimestamp (); // Add 60 seconds
-    $domainName   = $this->domainName;
-    $username     = $this->username; // Retrieved from filtered POST data
-    $user_email   = $this->user_email;
-    $payload      = [ 
+    $secret_Key = $this->secret_Key;
+    $date       = new DateTimeImmutable ();
+    $expire_at  = $date->modify ( $this->expire_at )->getTimestamp (); // Add 60 seconds
+    $domainName = $this->domainName;
+    $username   = $this->username; // Retrieved from filtered POST data
+    $user_email = $this->user_email;
+    $payload    = [ 
       'iat'       => $date->getTimestamp (),
       'iss'       => $domainName,
       'sub'       => $domainName,
@@ -30,12 +32,33 @@ class JwtToken
       'userName'  => $username,
       'userEmail' => $user_email
     ];
-    $encoded_data = JWT::encode (
-      $payload,
-      $secret_Key,
-      'HS512'
-    );
-    return $encoded_data;
+    try
+    {
+      $encoded_data = JWT::encode (
+        $payload,
+        $secret_Key,
+        'HS512'
+      );
+      return $encoded_data;
+    }
+    catch ( Exception $e )
+    {
+      echo $e->getMessage ();
+      return false;
+    }
+  }
+
+  public function decode ( $jwtToken )
+  {
+    try
+    {
+      return JWT::decode ( $jwtToken, new Key ( $this->secret_Key, 'HS512' ) );
+    }
+    catch ( Exception $e )
+    {
+      echo $e->getMessage ();
+      return false;
+    }
   }
 
 }

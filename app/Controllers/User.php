@@ -4,17 +4,23 @@ namespace App\Controllers;
 use PDO;
 use App\Router\Route;
 use App\Models\User as User_Model;
+use App\Middleware\JwtToken;
+use DateTimeImmutable;
+
+
 
 class User
 {
   protected $user_model;
+  protected $jwtToken;
   public function __construct ()
   {
     $this->user_model = new User_Model;
+    $this->jwtToken   = new JwtToken;
   }
   public function index ()
   {
-    Route::get ( '/', function ()
+    Route::get ( '/home', function ()
     {
       return view ( 'welcome' );
     } );
@@ -34,7 +40,6 @@ class User
   {
     Route::post ( '/register', function ()
     {
-      session_start ();
       $name             = $_POST[ 'name' ];
       $email            = $_POST[ 'email' ];
       $password         = $_POST[ 'password' ];
@@ -68,11 +73,18 @@ class User
           );
           if ( $is_mailed )
           {
-            $code      = $this->random_string ( 5 ) . $code . $this->random_string ( 5 );
+            $this->jwtToken->expire_at  = "+30 minutes";
+            $this->jwtToken->username   = $name;
+            $this->jwtToken->user_email = $email;
+            $encodedJwtToken            = $this->jwtToken->encode ();
+
+            $date      = new DateTimeImmutable ();
+            $expire_at = $date->modify ( $this->jwtToken->expire_at )->getTimestamp ();
+            setcookie ( "_jwtToken", $encodedJwtToken, $expire_at );
+
+
+            $code      = $name . $code . $email;
             $hash_code = password_hash ( $code, PASSWORD_DEFAULT );
-            setcookie ( "_opt", $hash_code, time () + 3600 );
-
-
             $this->user_model->insert_into ( [ 
               'name'              => $name,
               'email'             => $email,
@@ -88,7 +100,7 @@ class User
 
       }
 
-      header ( "Location: register" );
+      return header ( "Location: register" );
 
 
     } );
@@ -101,19 +113,50 @@ class User
   {
     Route::post ( '/email-verify', function ()
     {
-      $opt = $_POST[ 'opt' ];
-      $this->user_model->select ( [ 'email_verified', 'verification_code' ], [ 'email' => '' ] );
+      if ( isset( $_COOKIE[ '_jwtToken' ] ) )
+      {
+        $opt  = $_POST[ 'opt' ];
+        $data = $this->jwtToken->decode ( $_COOKIE[ '_jwtToken' ] );
+        $iss  = "firebase-adminsdk-2rkbg@jwt-token-3032f.iam.gserviceaccount.com";
+        if ( $data && $data->exp > time () && $data->iss === $iss )
+        {
+          $name  = $data->userName;
+          $email = $data->userEmail;
+          $opt   = $name . $opt . $email;
+
+          $info     = $this->user_model->select (
+            [ 'verification_code' ],
+            [ 'email' => $email ]
+          );
+          $hash_opt = $info[ 0 ][ 'verification_code' ];
+          if ( password_verify ( $opt, $hash_opt ) )
+          {
+            $this->user_model->update_set ( [ 'email_verified' => 1 ], [ 'email' => $email ] );
+
+            return header ( "Location: home" );
+          }
+          else
+          {
+            setcookie ( "optError", "Your verification code was wrong", time () + 3600 );
+            return header ( "Location: email-verify" );
+          }
+
+        }
+
+
+      }
+
+      setcookie ( "_jwtTokenExpired", "Cookies Expired! You need to reload this page", time () + 3600 );
+      return view ( "email_verify" );
+
+      // $this->user_model->select ( [ 'email_verified', 'verification_code' ], [ 'email' => '' ] );
 
     } );
     Route::get ( '/email-verify', function ()
     {
-      $this->user_model->select ( [ 'email_verified' ], [ 'email' => '' ] );
-      if ( ! isset( $_COOKIE[ '_opt' ] ) )
+      if ( ! isset( $_COOKIE[ '_jwtToken' ] ) )
       {
-        setcookie ( "email_verification_code_time_out", "Your validation code is invalid", time () + 3600 );
-        setcookie ( "email_verification_code_time_out", "", time () - 3600 );
-        return header ( 'Location: register' );
-        // exit();
+        return header ( "Location: login" );
       }
       return view ( 'email_verify' );
     } );

@@ -86,8 +86,29 @@ class Model extends Database
 
   }
 
-  public function update_set ()
+  public function update_set ( $data = [], $condition = [] )
   {
+    $SQL       = "UPDATE users SET ";
+    $data_cols = "";
+    $cond_cols = "";
+    $values    = [];
+
+    foreach ( $data as $col => $value )
+    {
+      $data_cols            = $data_cols . $col . " = " . ":" . $col . ", ";
+      $values[ ":" . $col ] = $value;
+    }
+    $data_cols = substr_replace ( $data_cols, '', strlen ( $data_cols ) - 2 );
+    $SQL       = $SQL . $data_cols;
+
+    foreach ( $condition as $col => $value )
+    {
+      $cond_cols            = $cond_cols . $col . " = " . ":" . $col;
+      $values[ ":" . $col ] = $value;
+    }
+    $SQL      = $SQL . " WHERE " . $cond_cols;
+    $pdo_stmt = $this->pdo->prepare ( $SQL );
+    $pdo_stmt->execute ( $values );
 
   }
 
