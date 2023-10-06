@@ -81,7 +81,6 @@ class User
               'verification_code' => $hash_code
             ] );
 
-            // die();
             return header ( "Location: email-verify" );
           }
           setcookie ( 'mail_send_error', "We have some error while sending to your email" );
@@ -108,6 +107,14 @@ class User
     } );
     Route::get ( '/email-verify', function ()
     {
+      $this->user_model->select ( [ 'email_verified' ], [ 'email' => '' ] );
+      if ( ! isset( $_COOKIE[ '_opt' ] ) )
+      {
+        setcookie ( "email_verification_code_time_out", "Your validation code is invalid", time () + 3600 );
+        setcookie ( "email_verification_code_time_out", "", time () - 3600 );
+        return header ( 'Location: register' );
+        // exit();
+      }
       return view ( 'email_verify' );
     } );
 
