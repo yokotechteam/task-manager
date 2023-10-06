@@ -15,13 +15,13 @@
     <div class="d-flex justify-content-center mt-5">
 
       <!-- REGISTER START -->
-      <form action="register" method="post" class=" row container bg-body-secondary py-3 rounded-3 ">
+      <form action="email_verify" method="post" class=" row container bg-body-secondary py-3 rounded-3 ">
         <h3 class="text-center ">EMAIL VERIFICATION</h3>
 
         <!-- USER EMAIL -->
         <div class="mb-3 col-12">
-          <label for="code" class="form-label">VERIFICATION CODE</label>
-          <input type="number" name="code" id="code" class="form-control">
+          <label for="opt" class="form-label">VERIFICATION CODE</label>
+          <input type="text" name="opt" id="opt" class="form-control">
         </div>
 
 

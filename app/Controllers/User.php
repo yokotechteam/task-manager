@@ -3,10 +3,15 @@ namespace App\Controllers;
 
 use PDO;
 use App\Router\Route;
-use App\Controllers\Database;
+use App\Models\User as User_Model;
 
-class User extends Database
+class User
 {
+  protected $user_model;
+  public function __construct ()
+  {
+    $this->user_model = new User_Model;
+  }
   public function index ()
   {
     Route::get ( '/', function ()
@@ -40,23 +45,50 @@ class User extends Database
         $is_taken = $this->email_exists ( $email );
         if ( ! $is_taken )
         {
-          $code              = $this->random_string ( 10 );
-          $_SESSION[ 'opt' ] = $this->random_string ( 5 ) . $code . $this->random_string ( 5 );
+          $code      = $this->random_string ( 10 );
+          $subject   = 'Task Manager Verification Code';
+          $body      = "
+            <h4>Task Manager Verification Code</h4>
+            <br>
+            Hi $name,
+            <br>
+            We received a request to access your Account $email through your email address. Your Task verification code is:
+            <br>
+              <h1>$code</h1>
+            <br>
+            This link will expire in 30 minutes.
+            <br>
+            Best,
+              <br>
+            The YoKo Team";
+          $is_mailed = mailer (
+            true,
+            [ 'address' => $email, 'name' => $name ],
+            [ 'subject' => $subject, 'body' => $body ]
+          );
+          if ( $is_mailed )
+          {
+            $code      = $this->random_string ( 5 ) . $code . $this->random_string ( 5 );
+            $hash_code = password_hash ( $code, PASSWORD_DEFAULT );
+            setcookie ( "_opt", $hash_code, time () + 3600 );
 
-          $sql      = "INSERT INTO users (name, email, password, hash_password, verification_code) VALUES (:name, :email, :password, :hash_password, :verification_code)";
-          $pdo_stmt = $this->pdo->prepare ( $sql );
-          $result   = $pdo_stmt->execute ( [ 
-            ":name"              => $name,
-            ":email"             => $email,
-            ":password"          => $password,
-            ":hash_password"     => password_hash ( $password, PASSWORD_DEFAULT ),
-            ":verification_code" => password_hash ( $code, PASSWORD_DEFAULT )
-          ] );
-          header ( "Location: email-verify" );
-          exit();
+
+            $this->user_model->insert_into ( [ 
+              'name'              => $name,
+              'email'             => $email,
+              'password'          => $password,
+              'hash_password'     => password_hash ( $password, PASSWORD_DEFAULT ),
+              'verification_code' => $hash_code
+            ] );
+
+            // die();
+            return header ( "Location: email-verify" );
+          }
+          setcookie ( 'mail_send_error', "We have some error while sending to your email" );
         }
 
       }
+
       header ( "Location: register" );
 
 
@@ -65,6 +97,20 @@ class User extends Database
     {
       return view ( 'register' );
     } );
+  }
+  public function email_verify ()
+  {
+    Route::post ( '/email-verify', function ()
+    {
+      $opt = $_POST[ 'opt' ];
+      $this->user_model->select ( [ 'email_verified', 'verification_code' ], [ 'email' => '' ] );
+
+    } );
+    Route::get ( '/email-verify', function ()
+    {
+      return view ( 'email_verify' );
+    } );
+
   }
 
   public function validate ( $type )
@@ -104,20 +150,14 @@ class User extends Database
   }
   public function email_exists ( $email )
   {
-    $sql      = 'SELECT email FROM users WHERE email = :email';
-    $pdo_stmt = $this->pdo->prepare ( $sql );
-    $status   = $pdo_stmt->execute ( [ 
-      ":email" => $email
-    ] );
-    if ( $status )
+    $email = $this->user_model->select ( [ 'email' ], condition: [ "email" => $email ] );
+
+    if ( $email )
     {
-      if ( $pdo_stmt->fetch ( PDO::FETCH_ASSOC ) )
-      {
-        setcookie ( "email_taken", "Email is already Taken", time () + 3600 );
-        return true;
-      }
-      return false;
+      setcookie ( "email_taken", "Email is already Taken", time () + 3600 );
+      return $email;
     }
+    return false;
   }
   public function random_string ( $length )
   {
@@ -126,5 +166,6 @@ class User extends Database
     $str = str_replace ( [ "+", "/", "=" ], "", $str );
     $str = substr ( $str, 0, $length );
     return $str;
+
   }
 }

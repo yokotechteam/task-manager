@@ -21,7 +21,7 @@
         <div class="mb-3 col-12">
           <label for="name" class="form-label">NAME</label>
           <input type="text" name="name" id="name" class="form-control 
-          <?= isset( $_COOKIE[ 'form_empty' ] ) ? "border-danger" : ""; ?>">
+          <?= isset( $_COOKIE[ 'form_empty' ] ) || isset( $_COOKIE[ 'name_error' ] ) ? "border-danger" : ""; ?>">
           <span class="text-bg-warning 
           <?= isset( $_COOKIE[ 'form_empty' ] ) ? "d-flex" : "d-none"; ?>">
             <?= $_COOKIE[ 'form_empty' ]; ?>
@@ -38,7 +38,7 @@
         <div class="mb-3 col-12">
           <label for="email" class="form-label">EMAIL</label>
           <input type="email" name="email" id="email" class="form-control
-          <?= isset( $_COOKIE[ 'email_error' ] ) ? "border-danger" : ""; ?>
+          <?= isset( $_COOKIE[ 'email_error' ] ) || isset( $_COOKIE[ 'email_taken' ] ) || $_COOKIE[ 'mail_send_error' ] ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
           <?= isset( $_COOKIE[ 'email_error' ] ) ? "d-flex" : "d-none"; ?>">
@@ -49,6 +49,11 @@
           <?= isset( $_COOKIE[ 'email_taken' ] ) ? "d-flex" : "d-none"; ?>">
             <?= $_COOKIE[ 'email_taken' ]; ?>
             <?php setcookie ( "email_taken", '', time () - 3600 ); ?>
+          </span>
+          <span class="text-bg-warning 
+          <?= isset( $_COOKIE[ 'mail_send_error' ] ) ? "d-flex" : "d-none"; ?>">
+            <?= $_COOKIE[ 'mail_send_error' ]; ?>
+            <?php setcookie ( "mail_send_error", '', time () - 3600 ); ?>
           </span>
         </div>
 

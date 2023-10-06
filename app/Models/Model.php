@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use PDO;
 use App\Controllers\Database;
 
 class Model extends Database
 {
   protected $table;
 
-  public function select ( $cols = '*', $table = null, $condition = [] )
+  public function select ( $cols = '*', $condition = [] )
   {
-    // cols = [name, email, password] => name, email, password,
     if ( is_array ( $cols ) )
     {
       $temp = "";
@@ -18,26 +18,71 @@ class Model extends Database
       {
         $temp = $temp . $col . ", ";
       }
-      $temp[ strlen ( $temp ) - 2 ] = "";
-      return $temp;
+      $cols = substr_replace ( $temp, '', strlen ( $temp ) - 2 );
+
+    }
+    if ( ! $condition )
+    {
+      $SQL      = "SELECT " . $cols . " FROM " . $this->table;
+      $pdo_stmt = $this->pdo->prepare ( $SQL );
+      $isExe    = $pdo_stmt->execute ();
+    }
+    else
+    {
+      $SQL = "SELECT " . $cols . " FROM " . $this->table . " WHERE ";
+
+      $values = [];
+      $last   = array_key_last ( $condition );
+
+      if ( $last === 'operator' )
+      {
+        foreach ( $condition as $key => $value )
+        {
+          $SQL                  = $SQL . $key . '=' . ':' . $key . $condition[ $last ];
+          $values[ ":" . $key ] = $value;
+        }
+        array_pop ( $values );
+        // $SQL = str_replace ( $SQL, '', strlen ( $SQL ) - 20 );
+        $SQL = str_replace ( '&operator=:operator&', '', $SQL );
+      }
+      else
+      {
+        foreach ( $condition as $key => $value )
+        {
+          $SQL                  = $SQL . $key . ' = ' . ':' . $key;
+          $values[ ':' . $key ] = $value;
+        }
+      }
+      $pdo_stmt = $this->pdo->prepare ( $SQL );
+      $isExe    = $pdo_stmt->execute ( $values );
+    }
+    if ( $isExe )
+    {
+      return $pdo_stmt->fetchAll ( PDO::FETCH_ASSOC );
     }
 
-    // if ( ! $condition )
-    // {
-    //   $SQL      = "SELECT " . $cols . " FROM " . $table;
-    //   $pdo_stmt = $this->pdo->prepare ( $SQL );
-    //   $pdo_stmt->execute ();
-    // }
-    // else
-    // {
-    //   $SQL      = "SELECT " . $cols . " FROM " . $table . " WHERE " . $condition;
-    //   $pdo_stmt = $this->pdo->prepare ( $SQL );
-    //   $pdo_stmt->execute ();
-    // }
-
   }
-  public function insert_into ()
+  public function insert_into ( $data = [] )
   {
+    $SQL    = "INSERT INTO " . $this->table;
+    $cols   = "";
+    $recs   = "";
+    $values = [];
+    foreach ( $data as $key => $value )
+    {
+      $cols = $cols . $key . ", "; // name, email, pass, 
+      $recs = $recs . ":" . $key . ", "; // :name, :email, :pass, 
+
+      $values[ ":" . $key ] = $value;
+    }
+    $cols = substr_replace ( $cols, '', strlen ( $cols ) - 2 );
+    $SQL  = $SQL . " (" . $cols . ") ";
+
+    $recs     = substr_replace ( $recs, '', strlen ( $recs ) - 2 );
+    $SQL      = $SQL . " VALUES " . " (" . $recs . ") ";
+    $pdo_stmt = $this->pdo->prepare ( $SQL );
+    $pdo_stmt->execute ( $values );
+
 
   }
 

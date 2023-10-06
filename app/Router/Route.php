@@ -1,6 +1,8 @@
 <?php
 namespace App\Router;
 
+// use App\Models\Model;
+
 class Route
 {
   public static function handle ( $method = 'GET', $path = '/', $filename = '' )

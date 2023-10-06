@@ -8,7 +8,8 @@
         "files": [
             "app/Helper/view.php",
             "app/init.php",
-            "config/database.php"
+            "config/database.php",
+            "app/Helper/mail.php"
         ]
     },
     "authors": [
