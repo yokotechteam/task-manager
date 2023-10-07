@@ -36,7 +36,12 @@
           </span>
         </div>
 
-
+        <input type="hidden" name="_token" value="<?= $_SESSION[ '_token' ]; ?>">
+        <span class="text-bg-warning 
+          <?= isset( $_COOKIE[ '_csrf_invalid' ] ) ? "d-flex" : "d-none"; ?>">
+          <?= $_COOKIE[ '_csrf_invalid' ]; ?>
+          <?php setcookie ( "_csrf_invalid", '', time () - 3600 ); ?>
+        </span>
 
         <!-- REGISTER OR LOGIN BUTTONS -->
         <div class="mb-3 col-12">

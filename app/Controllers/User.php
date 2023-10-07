@@ -2,11 +2,11 @@
 namespace App\Controllers;
 
 use PDO;
+use DateTimeImmutable;
 use App\Router\Route;
 use App\Models\User as User_Model;
 use App\Middleware\JwtToken;
-use DateTimeImmutable;
-
+use App\Middleware\CsrfToken;
 
 
 class User
@@ -27,12 +27,43 @@ class User
   }
   public function login ()
   {
-    if ( $_SERVER[ 'REQUEST_METHOD' ] === 'POST' )
+    Route::post ( '/login', function ()
     {
-      // something
-    }
+      if ( ! CsrfToken::check () )
+      {
+        setcookie ( '_token_invalid', "Invalid CSRF Token", time () + 3600 );
+        return header ( "Location: login" );
+      }
+      $email    = $_POST[ 'email' ];
+      $password = $_POST[ 'password' ];
+
+      $users = $this->user_model->select ( [ 'email', 'hash_password' ], [ 'email' => $email ] );
+      // var_dump ( $users );
+      if ( $users )
+      {
+
+        $db_pw = $users[ 0 ][ 'hash_password' ];
+        if ( password_verify ( $password, $db_pw ) )
+        {
+          return header ( "Location: home" );
+        }
+        else
+        {
+          setcookie ( "invalid_password", "Your Password is not correct", time () + 3600 );
+          return header ( "Location: login" );
+        }
+      }
+      else
+      {
+        setcookie ( "email_not_exists", "Invalid email", time () + 3600 );
+        return header ( "Location: login" );
+      }
+
+    } );
+
     Route::get ( '/login', function ()
     {
+      CsrfToken::generate ();
       return view ( 'login' );
     } );
   }
@@ -40,6 +71,12 @@ class User
   {
     Route::post ( '/register', function ()
     {
+
+      if ( ! CsrfToken::check () )
+      {
+        setcookie ( '_csrf_invalid', "Invalid Csrf Token", time () + 3600 );
+        return header ( "Location: register" );
+      }
       $name             = $_POST[ 'name' ];
       $email            = $_POST[ 'email' ];
       $password         = $_POST[ 'password' ];
@@ -106,6 +143,7 @@ class User
     } );
     Route::get ( '/register', function ()
     {
+      CsrfToken::generate ( 3600 );
       return view ( 'register' );
     } );
   }
@@ -113,6 +151,11 @@ class User
   {
     Route::post ( '/email-verify', function ()
     {
+      if ( ! CsrfToken::check () )
+      {
+        setcookie ( '_csrf_invalid', 'Invalid Csrf Token', time () + 3600 );
+        return header ( "Location: email-verify" );
+      }
       if ( isset( $_COOKIE[ '_jwtToken' ] ) )
       {
         $opt  = $_POST[ 'opt' ];
@@ -154,6 +197,7 @@ class User
     } );
     Route::get ( '/email-verify', function ()
     {
+      CsrfToken::generate ();
       if ( ! isset( $_COOKIE[ '_jwtToken' ] ) )
       {
         return header ( "Location: login" );

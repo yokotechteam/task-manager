@@ -82,7 +82,12 @@
             <?php setcookie ( "confirm_password_error", '', time () - 3600 ); ?>
           </span>
         </div>
-
+        <span class="text-bg-warning 
+          <?= isset( $_COOKIE[ '_csrf_invalid' ] ) ? "d-flex" : "d-none"; ?>">
+          <?= $_COOKIE[ '_csrf_invalid' ]; ?>
+          <?php setcookie ( "_csrf_invalid", '', time () - 3600 ); ?>
+        </span>
+        <input type="hidden" name="_token" value="<?php echo $_SESSION[ '_token' ]; ?>">
         <!-- REGISTER OR LOGIN BUTTONS -->
         <div class="mb-3 col-12">
           <button class="btn btn-outline-dark col-12 mb-3">Register</button>

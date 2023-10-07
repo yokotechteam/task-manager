@@ -22,8 +22,12 @@ if ( ! array_key_exists ( $route, $routes ) )
 {
   return false;
 }
+
+session_start ();
+
 $controller = $routes[ $route ][ 0 ];
 $method     = $routes[ $route ][ 1 ];
+
 
 $ctrl = new $controller ();
 $ctrl->$method ();
