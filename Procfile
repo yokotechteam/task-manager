@@ -1,1 +1,1 @@
-web: /task-manager/public/
+web: web: heroku-php-apache2 public/
