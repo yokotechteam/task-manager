@@ -13,11 +13,11 @@ class User
 {
   protected $user_model;
   protected $jwtToken;
-  // public function __construct ()
-  // {
-  //   $this->user_model = new User_Model;
-  //   $this->jwtToken   = new JwtToken;
-  // }
+  public function __construct ()
+  {
+    $this->user_model = new User_Model;
+    $this->jwtToken   = new JwtToken;
+  }
   public function index ()
   {
     // die(var_dump("Wellcome"));
