@@ -20,9 +20,9 @@ class User
   // }
   public function index ()
   {
+    die(var_dump("Wellcome"));
     Route::get ( '/home', function ()
     {
-      die(var_dump("Wellcome"));
       return view ( 'welcome' );
     } );
   }
