@@ -13,8 +13,8 @@ class Route
     {
       return false;
     }
-    define ( 'ROOT_PATH', '/task-manager/public' );
-    $pattern = '#^' . ROOT_PATH . $path . '$#siD';
+    // define ( 'ROOT_PATH', '/task-manager/public' );
+    $pattern = '#^' . $path . '$#siD';
     if ( preg_match ( $pattern, $current_uri ) )
     {
       if ( is_callable ( $filename ) )
