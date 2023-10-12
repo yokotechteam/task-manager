@@ -18,7 +18,6 @@ $route  = $_SERVER[ 'REQUEST_URI' ];
 
 if ( $route === '/' )
 {
-  // die( var_dump ( $route ) );
   return header ( "Location: /home" );
 }
 if ( ! array_key_exists ( $route, $routes ) )
@@ -31,6 +30,7 @@ session_start ();
 $controller = $routes[ $route ][ 0 ];
 $method     = $routes[ $route ][ 1 ];
 
+die( var_dump ( $route ) );
 
 $ctrl = new $controller ();
 $ctrl->$method ();
