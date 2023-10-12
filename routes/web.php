@@ -4,7 +4,8 @@ require_once "../vendor/autoload.php";
 use App\Controllers\User;
 // use App\Controllers\Page;
 
-$ROOT = '/task-manager/public';
+die(var_dump($_SERVER['REQUEST_URI']))
+$ROOT = 'personal-task-manager-app-6fe4f15227c7.herokuapp.com/home';
 
 $routes = [ 
   '/home'         => [ User::class, 'index' ],
