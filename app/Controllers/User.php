@@ -22,6 +22,7 @@ class User
   {
     Route::get ( '/home', function ()
     {
+      die(var_dump("Wellcome"));
       return view ( 'welcome' );
     } );
   }
