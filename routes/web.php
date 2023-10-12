@@ -18,7 +18,7 @@ $route  = $_SERVER[ 'REQUEST_URI' ];
 
 if ( $route === '/' )
 {
-  die( var_dump ( $route ) );
+  // die( var_dump ( $route ) );
   return header ( "Location: /home" );
 }
 if ( ! array_key_exists ( $route, $routes ) )
