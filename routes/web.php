@@ -5,7 +5,7 @@ use App\Controllers\User;
 // use App\Controllers\Page;
 
 die(var_dump($_SERVER['REQUEST_URI']))
-$ROOT = 'personal-task-manager-app-6fe4f15227c7.herokuapp.com/home';
+$ROOT = 'http://personal-task-manager-app-6fe4f15227c7.herokuapp.com/';
 
 $routes = [ 
   '/home'         => [ User::class, 'index' ],
