@@ -14,6 +14,8 @@ $routes = [
   '/email-verify' => [ User::class, 'email_verify' ]
 ];
 // $route  = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
+// $route  = $_SERVER[ 'REQUEST_URI' ];
+
 // die( var_dump ( $route ) );
 if ( $route === '/' )
 {
