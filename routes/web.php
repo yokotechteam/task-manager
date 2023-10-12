@@ -32,5 +32,5 @@ $method     = $routes[ $route ][ 1 ];
 
 
 $ctrl = new $controller ();
-die( var_dump ( $ctrl ) );
+// die( var_dump ( $ctrl ) );
 $ctrl->$method ();
