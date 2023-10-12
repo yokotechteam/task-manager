@@ -38,7 +38,7 @@
         <div class="mb-3 col-12">
           <label for="email" class="form-label">EMAIL</label>
           <input type="email" name="email" id="email" class="form-control
-          <?= isset( $_COOKIE[ 'email_error' ] ) || isset( $_COOKIE[ 'email_taken' ] ) || $_COOKIE[ 'mail_send_error' ] ? "border-danger" : ""; ?>
+          <?= isset( $_COOKIE[ 'email_error' ] ) || isset( $_COOKIE[ 'email_taken' ] ) || isset( $_COOKIE[ 'mail_send_error' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
           <?= isset( $_COOKIE[ 'email_error' ] ) ? "d-flex" : "d-none"; ?>">
