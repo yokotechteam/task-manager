@@ -4,7 +4,7 @@ require_once "../vendor/autoload.php";
 use App\Controllers\User;
 // use App\Controllers\Page;
 
-die(var_dump($_SERVER['REQUEST_URI']))
+die(var_dump($_SERVER['REQUEST_URI']));
 $ROOT = '/task_manager/public/';
 
 $routes = [ 
