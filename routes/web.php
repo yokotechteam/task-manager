@@ -30,7 +30,7 @@ session_start ();
 $controller = $routes[ $route ][ 0 ];
 $method     = $routes[ $route ][ 1 ];
 
-die( var_dump ( $route ) );
 
 $ctrl = new $controller ();
+die( var_dump ( $ctrl ) );
 $ctrl->$method ();
