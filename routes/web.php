@@ -2,7 +2,7 @@
 require_once "../vendor/autoload.php";
 
 use App\Controllers\User;
-use App\Controllers\Page;
+// use App\Controllers\Page;
 
 $ROOT = '/task-manager/public';
 
