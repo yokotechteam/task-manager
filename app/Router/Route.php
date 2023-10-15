@@ -13,10 +13,11 @@ class Route
       return false;
     }
     // Local development
-    define ( 'ROOT_PATH', '/task-manager/public' );
-    $pattern = '#^' . ROOT_PATH . $path . '$#siD';
+    // define ( 'ROOT_PATH', '/task-manager/public' );
+    // $pattern = '#^' . ROOT_PATH . $path . '$#siD';
 
-    // $pattern = '#^' . $path . '$#siD';
+    // deploy
+    $pattern = '#^' . $path . '$#siD';
 
 
     if ( preg_match ( $pattern, $current_uri ) )
