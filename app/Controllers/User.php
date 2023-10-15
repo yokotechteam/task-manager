@@ -82,7 +82,7 @@ class User
           $this->isLogin    = true;
 
           $token = $this->generate ();
-          setcookie ( "_qLoginToken", $token, $this->date->modify ( $this->expire_at ) );
+          setcookie ( "_qLoginToken", $token, $this->date->modify ( $this->expire_at )->getTimestamp () );
           return header ( "Location: home" );
         }
         else
