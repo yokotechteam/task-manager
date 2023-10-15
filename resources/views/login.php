@@ -21,7 +21,7 @@
         <!-- USER EMAIL -->
         <div class="mb-3 col-12">
           <label for="email" class="form-label">EMAIL</label>
-          <input type="email" name="email" value="www.waihlanphyo528@gmail.com" id="email" class="form-control
+          <input type="email" name="email" id="email" class="form-control
           <?= isset( $_COOKIE[ 'email_not_exists' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
@@ -34,7 +34,7 @@
         <!-- USER PASSWORD -->
         <div class="mb-3 col-12">
           <label for="password" class="form-label">PASSWORD</label>
-          <input type="password" name="password" value="YoKo@@1423" id="password" class="form-control
+          <input type="password" name="password" id="password" class="form-control
             <?= isset( $_COOKIE[ 'invalid_password' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
