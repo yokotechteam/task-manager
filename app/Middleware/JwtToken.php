@@ -2,27 +2,27 @@
 declare(strict_types=1);
 namespace App\Middleware;
 
-use DateTimeImmutable;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class JwtToken
+trait JwtToken
 {
-  public $secret_Key = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCt5fK4AuTxHOii\n4P7VoHCo8TYYO4GYQ4MmJ1pRDUKIE0cEv9u6Zt4waL6by+rB7ms1sEp2DC1Bj3XH\ny/vcKiRDXkFS20hPp8Y4bkRHTipLCb+RZCKy5hnzxBmt7VCmMIVvl7/1BiK9mYi5\nQxukDPaZW0gEDlTcM9lZlgyZGvD6QpmX81PcMOTFmY+c/MOSoE6eqM4w8J/Tkfq7\neBIxb0PGtysNTIx4mn1IYeU1CmpxRze+T9WI4bkgNBy40z3AWtsgyfgsn3VQF53k\n70VvLMzkORqG8TTQL+vuvj91UiGNqkWJ+oDcL8pqdTshPXPnpew3X5X9H7rBbXVg\nbXWFUHm/AgMBAAECggEAOuoLmBHK9HDh08S8MS3A3UuTExSd7DL7LKLqc0k1wBof\n1lkVnQoavnXOFcQ5DWizw6WtJF8tuedbdMwD0OwqCvTU1rhZwDrL6fRZh3rQ00lD\nMIOnScqxAifut0EOMK+BlXPo4Z8ph+iLLJCyvZpytTP6qv0b/NpICZTPQdOhznbQ\nz2avrd9TGduTjKfkKprODl3xALrAt9gMB0zm8lvrBPX+I/IZOCM/6K10Z8zcAFD+\nURdMFZI1FsIEdPOIP4fMICZtPCwoUUGgQiLWt0lA+pTmdLkNfl7Tp7f0bRYvjpnj\nSw361RMgIC9LRiJcR2ULVEcI5Mqxvm4rxD2+PneAgQKBgQDVOMiZ6vC8Qt6gsikx\n7Fnbeh9nL6ASwOQDeqZWDQnR8+QjC001cHWyNu3J2azmh0MnQn3KPUw+lWkDNFpl\n3XYoebhcK9Qz6sHuXw8fiB0bHZYZLQIsg7Tnmw/X1h2qWI9SkEbP99RzO826xhNK\nfbd0yBk3W1VcFNkXVVv1BMrDQQKBgQDQyXqjwJUia7Vk6ZCJJW2WH2fqQS6XEvhz\ncEQTJ+cnB613KE8Ldi4tl7dEm7MR6k3fOgX8EM/wh14jkmxmcTIdM6LHYivtusXA\nRGhC12R1sfQPgL/Qjtfm7kGv3kRP26x1ZzLs8IKHU+0Fl2+i+iUKhNH4/FoG8O4j\nMIMIMiT8/wKBgAGRc1g+dBrOWxjPdqIZXOfSVBzMKt84b/TemA6V9faHVqwzTxQP\nia4P3VvYr/7aC9JkGMy9+quTKbyOTAPnxxCxJHv5Dox7M4XvSQswUxZ59zqkLBnr\ntg7mAw3RU1KHaDZxPTQWXIekbvTqtAWeOxUuy5CuqUgOFzKmvBBnQp6BAoGAbk+l\nTlN3+CG0S0bkKLHvvnuFac1aklNhlYxhS0Wv6X0y91wCt2mPaGNaXxNsfzCuSBze\nAJnZY5oB8QVx5IY2FhusC3AhCY++36DE/VvUJiMJcg9ySPzPsaF8bzEeIptL+RO3\nYlyIenurJWMnhpJnc7FNRyH9ZuFw0ILXGEN2K30CgYEAlKVhERMY9CzynkwSApTr\nVWLib5Owj4YJXJl4TdcJTMKTqBmfbaHbbgo8tQTK0S/568qF9DYtQK+SV52rBEiJ\n3EJsqXo0UvJ4Vo8351je5XrxEe7jo34xtS909EDjIDmTWiZK9nE7rxImecHY8oBJ\niB5m9ha9Rg/ivoGElaN0tSQ=\n-----END PRIVATE KEY-----\n";
-  public $expire_at = '+6 minutes';
-  public $domainName = 'firebase-adminsdk-2rkbg@jwt-token-3032f.iam.gserviceaccount.com';
-  public $username;
-  public $user_email;
+
   public function encode ()
   {
-    $secret_Key = $this->secret_Key;
-    $date       = new DateTimeImmutable ();
-    $expire_at  = $date->modify ( $this->expire_at )->getTimestamp (); // Add 60 seconds
     $domainName = $this->domainName;
+    $secret_Key = $this->secret_Key;
+
+    $date      = $this->date;
+    $expire_at = $date->modify ( $this->expire_at )->getTimestamp (); // Add 60 seconds
+
     $username   = $this->username; // Retrieved from filtered POST data
     $user_email = $this->user_email;
-    $payload    = [ 
+
+    $isLogin = $this->isLogin;
+
+    $payload = [ 
       'iat'       => $date->getTimestamp (),
       'iss'       => $domainName,
       'sub'       => $domainName,
@@ -30,14 +30,15 @@ class JwtToken
       'nbf'       => $date->getTimestamp (),
       'exp'       => $expire_at,
       'userName'  => $username,
-      'userEmail' => $user_email
+      'userEmail' => $user_email,
+      'isLogin'   => $isLogin,
     ];
     try
     {
       $encoded_data = JWT::encode (
         $payload,
         $secret_Key,
-        'HS512'
+        'HS512',
       );
       return $encoded_data;
     }
@@ -47,7 +48,7 @@ class JwtToken
       return false;
     }
   }
-
+  // abstract public function encode ();
   public function decode ( $jwtToken )
   {
     try
@@ -56,7 +57,7 @@ class JwtToken
     }
     catch ( Exception $e )
     {
-      echo $e->getMessage ();
+      $e->getMessage ();
       return false;
     }
   }

@@ -88,7 +88,7 @@ class Model extends Database
 
   public function update_set ( $data = [], $condition = [] )
   {
-    $SQL       = "UPDATE users SET ";
+    $SQL       = "UPDATE " . $this->table . " SET ";
     $data_cols = "";
     $cond_cols = "";
     $values    = [];
@@ -112,8 +112,20 @@ class Model extends Database
 
   }
 
-  public function delete ()
+  public function delete_from ( $condition = [] )
   {
-
+    // [id => 1]
+    $SQL    = "DELETE FROM " . $this->table . " WHERE ";
+    $col    = "";
+    $values = [];
+    foreach ( $condition as $key => $value )
+    {
+      # code...
+      $col                  = $col . $key . " = :" . $key; // id = :id
+      $values[ ":" . $key ] = $value;
+    }
+    $SQL      = $SQL . $col;
+    $pdo_stmt = $this->pdo->prepare ( $SQL );
+    $pdo_stmt->execute ( $values );
   }
 }

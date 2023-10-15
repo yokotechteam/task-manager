@@ -7,8 +7,19 @@
     <title>Welcome</title>
   </head>
 
-  <body>
-    <h1>WELCOME</h1>
+  <body style="background-color: #555;">
+
+    <p>
+      <?php
+      if ( ! empty( $_SESSION[ 'email_not_verified' ] ) )
+      {
+        echo $_SESSION[ 'email_not_verified' ];
+        session_destroy ();
+      }
+      ?>
+    </p>
+    <h1>WELCOME TO MY APP</h1>
+
   </body>
 
 </html>

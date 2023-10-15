@@ -20,7 +20,7 @@
         <!-- USER NAME -->
         <div class="mb-3 col-12">
           <label for="name" class="form-label">NAME</label>
-          <input type="text" name="name" id="name" class="form-control 
+          <input type="text" name="name" value="Ab123456" id="name" class="form-control 
           <?= isset( $_COOKIE[ 'form_empty' ] ) || isset( $_COOKIE[ 'name_error' ] ) ? "border-danger" : ""; ?>">
           <span class="text-bg-warning 
           <?= isset( $_COOKIE[ 'form_empty' ] ) ? "d-flex" : "d-none"; ?>">
@@ -37,7 +37,7 @@
         <!-- USER EMAIL -->
         <div class="mb-3 col-12">
           <label for="email" class="form-label">EMAIL</label>
-          <input type="email" name="email" id="email" class="form-control
+          <input type="email" name="email" value="www.waihlanphyo528@gmail.com" id="email" class="form-control
           <?= isset( $_COOKIE[ 'email_error' ] ) || isset( $_COOKIE[ 'email_taken' ] ) || isset( $_COOKIE[ 'mail_send_error' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
@@ -60,7 +60,7 @@
         <!-- USER PASSWORD -->
         <div class="mb-3 col-12">
           <label for="password" class="form-label">PASSWORD</label>
-          <input type="password" name="password" id="password" class="form-control
+          <input type="password" name="password" value="YoKo@@1423" id="password" class="form-control
           <?= isset( $_COOKIE[ 'password_error' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 
@@ -73,7 +73,7 @@
         <!-- CONFIRM PASSWORD -->
         <div class="mb-3 col-12">
           <label for="confirm_password" class="form-label">CONFIRM PASSWORD</label>
-          <input type="password" name="confirm_password" id="confirm_password" class="form-control
+          <input type="password" name="confirm_password" value="YoKo@@1423" id="confirm_password" class="form-control
            <?= isset( $_COOKIE[ 'confirm_password_error' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 

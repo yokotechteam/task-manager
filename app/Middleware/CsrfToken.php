@@ -32,6 +32,11 @@ class CsrfToken
       if ( $_SERVER[ 'REQUEST_METHOD' ] === "POST" )
       {
         // POST
+        if ( empty( $_POST[ '_token' ] ) )
+        {
+          session_destroy ();
+          return false;
+        }
         if (
           ! hash_equals ( $_SESSION[ '_token' ], $_POST[ '_token' ] ) ||
           $_SESSION[ '_token_exp' ] < time ()

@@ -1,7 +1,6 @@
 <?php
 namespace App\Router;
 
-// use App\Models\Model;
 
 class Route
 {
@@ -13,8 +12,13 @@ class Route
     {
       return false;
     }
-    // define ( 'ROOT_PATH', '/task-manager/public' );
-    $pattern = '#^' . $path . '$#siD';
+    // Local development
+    define ( 'ROOT_PATH', '/task-manager/public' );
+    $pattern = '#^' . ROOT_PATH . $path . '$#siD';
+
+    // $pattern = '#^' . $path . '$#siD';
+
+
     if ( preg_match ( $pattern, $current_uri ) )
     {
       if ( is_callable ( $filename ) )

@@ -2,27 +2,33 @@
 require_once "../vendor/autoload.php";
 
 use App\Controllers\User;
-// use App\Controllers\Page;
+use App\Controllers\Page;
 
-// die(var_dump($_SERVER['REQUEST_URI']));
-// $ROOT = '/';
+// local dev
+// $ROOT = '/task-manager/public';
 
 $routes = [ 
   '/home'         => [ User::class, 'index' ],
   '/login'        => [ User::class, 'login' ],
   '/register'     => [ User::class, 'register' ],
-  '/email-verify' => [ User::class, 'email_verify' ]
+  '/email-verify' => [ User::class, 'email_verify' ],
 ];
-// $route  = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
-$route  = $_SERVER[ 'REQUEST_URI' ];
+// Local development
+// $route = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
+
+//Deploy 
+$route = $_SERVER[ 'REQUEST_URI' ];
 
 if ( $route === '/' )
 {
-  return header ( "Location: /home" );
+  // Deploy
+  // return header ( "Location: home" );
+  return header ( "Location: home" );
 }
 if ( ! array_key_exists ( $route, $routes ) )
 {
-  return false;
+  $ctrl = new Page;
+  return $ctrl->page_not_found ();
 }
 
 session_start ();
