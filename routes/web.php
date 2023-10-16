@@ -13,7 +13,7 @@ $routes = [
 
 // Local development
 // $ROOT  = '/task-manager/public';
-$route = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
+// $route = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
 
 //Deploy 
 $route = $_SERVER[ 'REQUEST_URI' ];
