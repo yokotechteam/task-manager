@@ -1,19 +1,16 @@
 <?php
 namespace App\Router;
 
-
+// local dev
+// define ( 'ROOT_PATH', '/task-manager/public' );
 class Route
 {
   public static function handle ( $method = 'GET', $path = '/', $filename = '' )
   {
     $current_method = $_SERVER[ 'REQUEST_METHOD' ];
     $current_uri    = $_SERVER[ 'REQUEST_URI' ];
-    if ( $current_method !== $method )
-    {
-      return false;
-    }
+
     // Local development
-    // define ( 'ROOT_PATH', '/task-manager/public' );
     // $pattern = '#^' . ROOT_PATH . $path . '$#siD';
 
     // deploy
@@ -22,20 +19,17 @@ class Route
 
     if ( preg_match ( $pattern, $current_uri ) )
     {
+      if ( $current_method !== $method )
+      {
+        return false;
+      }
       if ( is_callable ( $filename ) )
       {
-        $file = $filename ();
-        if ( $file )
-        {
-          return $file;
-        }
-        return false;
+        return $filename ();
       }
       else
       {
-        $base_dir = __DIR__ . "/";
-        $filename = $base_dir . "../../resources/views/" . $filename . '.php';
-        return require_once $filename;
+        return require_once __DIR__ . "/../../resources/views/" . $filename . ".php";
       }
     }
     return false;

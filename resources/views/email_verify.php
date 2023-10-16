@@ -21,7 +21,8 @@
         <!-- USER EMAIL -->
         <div class="mb-3 col-12">
           <label for="opt" class="form-label">VERIFICATION CODE</label>
-          <input type="text" name="opt" id="opt" class="form-control 
+          <input type="text" name="opt" value="<?= ! empty( $_COOKIE[ 'code' ] ) ? htmlentities ( $_COOKIE[ 'code' ] ) : '';
+          setcookie ( 'code', '', time () - 3600 ); ?>" id="opt" class="form-control 
           <?= isset( $_COOKIE[ '_jwtTokenExpired' ] ) || isset( $_COOKIE[ 'optError' ] ) ? "border-danger" : ""; ?>
           ">
           <span class="text-bg-warning 

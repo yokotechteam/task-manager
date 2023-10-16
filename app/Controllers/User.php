@@ -8,7 +8,8 @@ use App\Models\User as User_Model;
 use App\Middleware\JwtToken;
 use App\Middleware\CsrfToken;
 use App\Middleware\QuickLoginToken;
-
+use Phpfastcache\CacheManager;
+use Phpfastcache\Config\Config;
 
 class User
 {
@@ -65,7 +66,8 @@ class User
       }
       $email    = $_POST[ 'email' ];
       $password = $_POST[ 'password' ];
-
+      setcookie ( 'email', $email );
+      setcookie ( 'password', $password );
       $users = $this->user_model->select ( [ 'name', 'email', 'hash_password' ], [ 'email' => $email ] );
       // var_dump ( $users );
       if ( $users )
@@ -74,6 +76,8 @@ class User
         $db_pw = $users[ 0 ][ 'hash_password' ];
         if ( password_verify ( $password, $db_pw ) )
         {
+          setcookie ( 'email', '', time () - 3600 );
+          setcookie ( 'password', '', time () - 3600 );
           $this->secret_Key = "QuickLoginToken@@1423";
           $this->date       = new DateTimeImmutable ();
           $this->expire_at  = "+7 days"; //
@@ -88,14 +92,13 @@ class User
         else
         {
           setcookie ( "invalid_password", "Your Password is not correct", time () + 3600 );
-          return header ( "Location: login" );
         }
       }
       else
       {
         setcookie ( "email_not_exists", "Invalid email", time () + 3600 );
-        return header ( "Location: login" );
       }
+      return header ( "Location: login" );
 
     } );
 
@@ -183,7 +186,10 @@ class User
         }
 
       }
-
+      setcookie ( 'name', $name );
+      setcookie ( 'email', $email );
+      setcookie ( 'password', $password );
+      setcookie ( 'confirm_password', $confirm_password );
       return header ( "Location: register" );
 
 
@@ -191,9 +197,7 @@ class User
     Route::get ( '/register', function ()
     {
       CsrfToken::generate ();
-
       $status = $this->check ( $_COOKIE );
-
       if ( $status )
       {
         return header ( "Location: home" );
@@ -204,6 +208,7 @@ class User
       }
       return header ( 'Location: login' );
     } );
+
   }
   public function email_verify ()
   {
@@ -221,6 +226,7 @@ class User
         $iss  = "firebase-adminsdk-2rkbg@jwt-token-3032f.iam.gserviceaccount.com";
         if ( $data && $data->exp > time () && $data->iss === $iss )
         {
+          setcookie ( 'code', $opt );
           $name     = $data->userName;
           $email    = $data->userEmail;
           $opt      = $name . $opt . $email;
@@ -232,6 +238,7 @@ class User
           if ( password_verify ( $opt, $hash_opt ) )
           {
             $this->user_model->update_set ( [ 'email_verified' => 1 ], [ 'email' => $email ] );
+            setcookie ( 'code', $opt, time () - 3600 );
             setcookie ( '_jwtToken', "", time () - 3600 );
             setcookie ( "email_verified", "Your email have been verified", time () + 3600 );
             return header ( "Location: login" );
@@ -259,35 +266,35 @@ class User
 
   }
 
+
+
   public function validate ( $type )
   {
+    $name     = "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,100}$/";
+    $email    = "@gmail.com";
+    $password = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!|&])[A-Za-z\d@$!|&]{8,20}$/";
+
     if ( ! strlen ( $type[ 'name' ] ) && ! strlen ( $type[ 'email' ] ) && ! strlen ( $type[ 'password' ] ) && ! strlen ( $type[ 'confirm_password' ] ) )
     {
       setcookie ( "form_empty", "You Need To Fill The Form", time () + 3600 );
       return false;
     }
-
-    $name = "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,100}$/";
-    if ( ! preg_match ( $name, $type[ 'name' ] ) )
+    elseif ( ! preg_match ( $name, $type[ 'name' ] ) )
     {
       setcookie ( "name_error", "At Least One Upper,One Lower And One Number In a Range Of 8 to 100", time () + 3600 );
       return false;
     }
-
-    $email = "@gmail.com";
-    if ( ! str_ends_with ( $type[ 'email' ], $email ) )
+    elseif ( ! str_ends_with ( $type[ 'email' ], $email ) )
     {
       setcookie ( "email_error", "Invalid Gmail Format", time () + 3600 );
       return false;
     }
-
-    $password = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!|&])[A-Za-z\d@$!|&]{8,20}$/";
-    if ( ! preg_match ( $password, $type[ 'password' ] ) )
+    elseif ( ! preg_match ( $password, $type[ 'password' ] ) )
     {
       setcookie ( "password_error", "Minimum eight and maximum 16 characters, at least one uppercase letter, one lowercase letter, one number and one special character", time () + 3600 );
       return false;
     }
-    if ( $type[ 'password' ] !== $type[ 'confirm_password' ] )
+    elseif ( $type[ 'password' ] !== $type[ 'confirm_password' ] )
     {
       setcookie ( "confirm_password_error", 'Password do not match', time () + 3600 );
       return false;

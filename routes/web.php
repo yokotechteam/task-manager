@@ -4,17 +4,16 @@ require_once "../vendor/autoload.php";
 use App\Controllers\User;
 use App\Controllers\Page;
 
-// local dev
-// $ROOT = '/task-manager/public';
-
 $routes = [ 
   '/home'         => [ User::class, 'index' ],
   '/login'        => [ User::class, 'login' ],
   '/register'     => [ User::class, 'register' ],
   '/email-verify' => [ User::class, 'email_verify' ],
 ];
+
 // Local development
-// $route = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
+// $ROOT  = '/task-manager/public';
+$route = str_replace ( $ROOT, '', $_SERVER[ 'REQUEST_URI' ] );
 
 //Deploy 
 $route = $_SERVER[ 'REQUEST_URI' ];
@@ -35,8 +34,5 @@ session_start ();
 
 $controller = $routes[ $route ][ 0 ];
 $method     = $routes[ $route ][ 1 ];
-
-
-$ctrl = new $controller ();
-// die( var_dump ( $ctrl ) );
+$ctrl       = new $controller ();
 $ctrl->$method ();
